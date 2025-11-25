@@ -1,0 +1,62 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+    <EventFiltering>
+       
+        <RuleGroup name="[T1059.001] PowerShell" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                    <!-- PowerShell Rules -->
+                    <Rule name="[T1059.001] PowerShell Encoded" groupRelation="and">
+                        <Image condition="end with">powershell.exe</Image>
+                        <CommandLine condition="contains any">-EncodedCommand;-enc;-e</CommandLine>
+                    </Rule>
+                    <Rule name="[T1059.001] Pwsh Encoded" groupRelation="and">
+                        <Image condition="end with">pwsh.exe</Image>
+                        <CommandLine condition="contains any">-EncodedCommand;-enc;-e</CommandLine>
+                    </Rule>
+                    <Rule name="[T1059.001] PowerShell Args" groupRelation="and">
+                        <Image condition="end with">powershell.exe</Image>
+                        <CommandLine condition="contains any">IEX;-ep;bypass;-Executionpolicy;-w;hidden;-windowstyle;Invoke-Expression;DownloadString,Net.WebClient,FromBase64String;New-Object</CommandLine>
+                    </Rule>
+                    <Rule name="[T1059.001] Pwsh Args" groupRelation="and">
+                        <Image condition="end with">pwsh.exe</Image>
+                        <CommandLine condition="contains any">IEX;-ep;bypass;-Executionpolicy;-w;hidden;-windowstyle;Invoke-Expression;DownloadString,Net.WebClient,FromBase64String;New-Object</CommandLine>
+                    </Rule>
+                    <Rule name="[T1059.001] PowerShell Office" groupRelation="and">
+                        <ParentImage condition="contains any">winword.exe;excel.exe;outlook.exe;powerpnt.exe</ParentImage>
+                        <Image condition="end with">powershell.exe</Image>
+                    </Rule>
+                    <Rule name="[T1059.001] PwSh Office" groupRelation="and">
+                        <ParentImage condition="contains any">winword.exe;excel.exe;outlook.exe;powerpnt.exe</ParentImage>
+                        <Image condition="end with">Pwsh.exe</Image>
+                    </Rule>
+                    <Rule name="[T1059.001] PowerShell detected" groupRelation="or">
+                        <Image condition="end with">powershell.exe</Image>
+                        <OriginalFileName condition="is">powershell.exe</OriginalFileName>
+                    </Rule>
+                    <Rule name="[T1059.001] Pwsh detected" groupRelation="or">
+                        <Image condition="end with">pwsh.exe</Image>
+                        <OriginalFileName condition="is">pwsh.dll</OriginalFileName>
+                    </Rule>
+            </ProcessCreate>
+
+            <NetworkConnect onmatch="include">
+                <!-- PowerShell Network -->
+                <Rule name="[T1059.001] PowerShell Network Activity" groupRelation="and">
+                    <Image condition="contains any">powershell.exe;pwsh.exe</Image>
+                    <Initiated condition="is">true</Initiated>
+                </Rule>
+            </NetworkConnect>
+
+            <FileCreate onmatch="include">
+                <!-- PowerShell Files -->
+                <Rule name="[T1059.001] PowerShell File" groupRelation="or">
+                    <TargetFilename condition="end with">.ps1</TargetFilename>				
+                    <TargetFilename condition="end with">.ps2</TargetFilename>	
+                    <TargetFilename condition="end with">.psm1</TargetFilename>	
+                </Rule>
+            </FileCreate>
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>

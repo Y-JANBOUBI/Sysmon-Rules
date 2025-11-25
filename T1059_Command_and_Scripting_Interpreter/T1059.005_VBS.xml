@@ -1,0 +1,33 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+
+    <EventFiltering>
+        
+        <RuleGroup name="[T1059.005] VBS" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                <!-- Visual Basic Rules -->
+                <Rule name="[T1059.005] VBScript Execution" groupRelation="and">
+                    <Image condition="contains any">cscript.exe;wscript.exe</Image>
+                    <CommandLine condition="contains any">.vbs;.vbe;CreateObject;WScript.Shell;Run;Exec</CommandLine>
+                </Rule>
+                <Rule name="[T1059.005] VBS Office" groupRelation="and">
+                    <ParentImage condition="contains any">winword.exe;excel.exe;outlook.exe;powerpnt.exe</ParentImage>
+                    <Image condition="contains any">cscript.exe;wscript.exe</Image>
+                </Rule>
+            </ProcessCreate>
+
+            <FileCreate onmatch="include">
+            <!-- Visual Basic Files -->
+                <Rule name="[T1059.005] VBScript File" groupRelation="or">
+                    <TargetFilename condition="end with">.vbs</TargetFilename>
+                    <TargetFilename condition="end with">.vbe</TargetFilename>
+                    <TargetFilename condition="end with">.wsf</TargetFilename>
+                    <TargetFilename condition="end with">.wsc</TargetFilename>
+                    <TargetFilename condition="end with">.sct</TargetFilename>
+                </Rule>
+            </FileCreate>
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>

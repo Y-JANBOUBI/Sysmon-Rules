@@ -1,0 +1,43 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+
+    <EventFiltering>
+        
+        <RuleGroup name="[T1059.003] CMD" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                <!-- CMD Rules -->
+                <Rule name="[T1059.003] CMD Office" groupRelation="and">
+                    <ParentImage condition="end with">winword.exe;excel.exe;outlook.exe;powerpnt.exe</ParentImage>
+                    <Image condition="end with">cmd.exe</Image>
+                </Rule>
+                <Rule name="[T1059.003] CMD Args" groupRelation="and">
+                    <Image condition="end with">cmd.exe</Image>
+                    <CommandLine condition="contains any">/c; /k; /q; /d; /r; echo</CommandLine>
+                </Rule>
+                <Rule name="[T1059.001] Cmd detected" groupRelation="or">
+                    <Image condition="end with">cmd.exe</Image>
+                    <OriginalFileName condition="is">cmd.exe</OriginalFileName>
+                </Rule>
+            </ProcessCreate>
+
+            <NetworkConnect onmatch="include">
+                <!-- CMD Network -->
+                <Rule name="[T1059.003] CMD Network Activity" groupRelation="and">
+                    <Image condition="end with">cmd.exe</Image>
+                    <Initiated condition="is">true</Initiated>
+                </Rule>
+            </NetworkConnect>
+
+            <FileCreate onmatch="include">
+                <!-- CMD Files -->
+                <Rule name="[T1059.003] Batch File" groupRelation="or">
+                    <TargetFilename condition="end with">.bat</TargetFilename>	
+                    <TargetFilename condition="end with">.cmd</TargetFilename>	
+                    <TargetFilename condition="end with">.cmdline</TargetFilename>			
+                </Rule>
+            </FileCreate>
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>

@@ -1,0 +1,50 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+
+    <EventFiltering>
+        
+        <RuleGroup name="[T1059.006] Python" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                <!-- Python Rules -->
+                <Rule name="[T1059.006] Python Args" groupRelation="and">
+                    <Image condition="contains">python</Image>
+                    <CommandLine condition="contains any">-c;exec;import;base64;urllib;http;socket;eval;subprocess;requests;os.system</CommandLine>
+                </Rule>
+                <Rule name="[T1059.006] Python Parent" groupRelation="and">
+                    <ParentImage condition="end with">winword.exe;excel.exe;mshta.exe;wscript.exe;cmd.exe;powershell.exe;explorer.exe;cscript.exe;outlook.exe</ParentImage>
+                    <Image condition="contains any">python.exe;python2.exe;python3.exe</Image>
+                    <CommandLine condition="contains any">http;base64;-c;urllib;requests</CommandLine>
+                </Rule>
+            </ProcessCreate>
+
+            <NetworkConnect onmatch="include">
+                <!-- Python Network -->
+                <Rule name="[T1059.006] Python Network Activity" groupRelation="and">
+                    <Image condition="contains any">python.exe;python2.exe;python3.exe</Image>
+                    <Initiated condition="is">true</Initiated>
+                </Rule>
+            </NetworkConnect>
+
+            <FileCreate onmatch="include">
+                <!-- Python Files -->
+                <Rule name="[T1059.006] Python File" groupRelation="or">
+                    <TargetFilename condition="end with">.py</TargetFilename>
+                    <TargetFilename condition="end with">.pyc</TargetFilename>
+                    <TargetFilename condition="end with">.pyw</TargetFilename>
+                    <TargetFilename condition="end with">.pyo</TargetFilename>
+                    <TargetFilename condition="end with">.pyc.enc</TargetFilename> 
+                    <TargetFilename condition="end with">.pyz</TargetFilename>
+                </Rule>
+            </FileCreate>
+            
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>
+            
+            
+            
+            
+            
+        

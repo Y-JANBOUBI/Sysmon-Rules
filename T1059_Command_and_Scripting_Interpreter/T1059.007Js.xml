@@ -1,0 +1,26 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+
+    <EventFiltering>
+        
+        <RuleGroup name="[T1059.007] JS" groupRelation="and">
+            <FileCreate onmatch="include">
+                <!-- JavaScript Files -->
+                <Rule name="[T1059.007] JS File" groupRelation="or">
+                    <TargetFilename condition="end with">.js</TargetFilename>
+                    <TargetFilename condition="end with">.jse</TargetFilename>
+                    <TargetFilename condition="end with">.js.enc</TargetFilename>
+                    <TargetFilename condition="end with">.javascript</TargetFilename> 
+                </Rule>
+            </FileCreate>
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>
+            
+            
+            
+            
+            
+        
