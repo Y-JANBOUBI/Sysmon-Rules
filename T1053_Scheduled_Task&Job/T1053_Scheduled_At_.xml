@@ -1,0 +1,62 @@
+                
+                
+  <Sysmon schemaversion="4.90">
+    <HashAlgorithms>*</HashAlgorithms>
+    <CheckRevocation/>
+        <EventFiltering>        
+            <RuleGroup name="[T1053]" groupRelation="and">
+                <!-- Scheduled process -->
+                <ProcessCreate onmatch="include">
+                    <Rule name="[T1053.005] Schtasks" groupRelation="and">
+                        <Image condition="end with">schtasks.exe</Image>
+                        <CommandLine condition="contains any">/create;/change</CommandLine>
+                    </Rule>
+                    <Rule name="[T1053.002] At" groupRelation="and">
+                        <Image condition="is">C:\Windows\System32\at.exe</Image>
+                        <CommandLine condition="contains any">/add;/interactive</CommandLine>
+                    </Rule>
+                    <Rule name="[T1053.002] At" groupRelation="and">
+                        <Image condition="is">C:\Windows\SysWOW64\at.exe</Image>
+                        <CommandLine condition="contains any">/add;/interactive</CommandLine>
+                    </Rule>
+                    <Rule name="[T1053] Scheduled Task/Job" groupRelation="or">
+                        <Image condition="end with">schtasks.exe</Image>
+                        <Image condition="end with">sctasks.exe</Image>
+                        <OriginalFileName condition="is">schtasks.exe</OriginalFileName>
+                        <OriginalFileName condition="is">sctasks.exe</OriginalFileName>
+                        <Image condition="is">C:\Windows\System32\at.exe</Image>
+                        <Image condition="is">C:\Windows\SysWOW64\at.exe</Image>   
+                        <OriginalFileName condition="is">at.exe</OriginalFileName>
+                        <OriginalFileName condition="is">taskeng.exe</OriginalFileName>
+                    </Rule>
+                </ProcessCreate>
+            
+                <!-- Scheduled Task Files -->
+                <FileCreate onmatch="include">
+                    <Rule name="[T1053] Scheduled Task Files" groupRelation="or">
+                        <TargetFilename condition="contains">C:\Windows\System32\Tasks\</TargetFilename>
+                        <TargetFilename condition="contains">C:\Windows\Tasks\</TargetFilename>
+                        <TargetFilename condition="begin with">C:\Windows\SysWOW64\Tasks</TargetFilename>
+                        <TargetFilename name="Scheduled Task Files" condition="end with">.job</TargetFilename>
+                    </Rule>                  
+                </FileCreate>
+
+                <!-- Scheduled Task reg -->
+                <RegistryEvent onmatch="include">
+                    <Rule name="[T1053] Scheduled Task Registry Key" groupRelation="and">
+                        <EventType condition="is">CreateKey</EventType>
+                        <TargetObject condition="contains">Schedule\TaskCache\Tree\</TargetObject>
+                    </Rule>
+                    <Rule name="[T1053] Scheduled Task Registry Value" groupRelation="and">
+                        <EventType condition="is">SetValue</EventType>
+                        <TargetObject condition="contains">Schedule\TaskCache\Tasks\</TargetObject>
+                    </Rule>
+                    <Rule name="[T1053] Scheduled Task Registry Activity" groupRelation="or">
+                        <TargetObject condition="contains">Schedule\TaskCache\Tree</TargetObject>
+                        <TargetObject condition="contains">Schedule\TaskCache\Tasks\</TargetObject>
+                    </Rule>
+                </RegistryEvent>
+            </RuleGroup>
+        </EventFiltering>
+  </Sysmon>              
+        
