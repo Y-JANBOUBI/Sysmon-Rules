@@ -53,10 +53,11 @@
             </Rule>
 
             <Rule name="[T1055]" groupRelation="or">
-              <TargetImage condition="image">winlogon.exe</TargetImage>
-              <TargetImage condition="image">services.exe</TargetImage>
-              <TargetImage condition="image">svchost.exe</TargetImage>
-              <TargetImage condition="image">explorer.exe</TargetImage>
+              <TargetImage condition="end with">winlogon.exe</TargetImage>
+              <TargetImage condition="end with">services.exe</TargetImage>
+              <TargetImage condition="end with">svchost.exe</TargetImage>
+              <TargetImage condition="end with">explorer.exe</TargetImage>
+              <TargetImage condition="end with">notepad.exe</TargetImage>
             </Rule>
 
             <Rule name="[T1055.001]" groupRelation="or">
@@ -116,3 +117,4 @@
       </RuleGroup>
     </EventFiltering>
 </Sysmon>
+
