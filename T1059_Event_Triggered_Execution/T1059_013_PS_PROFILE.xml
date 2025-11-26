@@ -1,0 +1,78 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+
+  <CheckRevocation/>
+    <EventFiltering>
+        <RuleGroup name="[T1546.013]" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                <!-- PowerShell Profile Rules -->
+                <!-- command lines that reference $PROFILE or known profile paths -->	
+                <Rule name="[T1546.013] Profile" groupRelation="and">
+                    <OriginalFileName condition="is">powershell.exe</OriginalFileName>
+                    <CommandLine condition="contains any">$PROFILE;profile.ps1;Microsoft.PowerShellISE_profile.ps1;Microsoft.PowerShell_profile.ps1;Microsoft.VSCode_profile.ps1</CommandLine>
+                </Rule>
+                <Rule name="[T1546.013] Profile" groupRelation="and">
+                    <OriginalFileName condition="is">cmd.exe</OriginalFileName>
+                    <CommandLine condition="contains any">$PROFILE;profile.ps1;Microsoft.PowerShellISE_profile.ps1;Microsoft.PowerShell_profile.ps1;Microsoft.VSCode_profile.ps1</CommandLine>
+                </Rule>
+                <Rule name="[T1546.013] Profile" groupRelation="and">
+                    <Image condition="end with">pwsh.exe</Image>
+                    <OriginalFileName condition="is">pwsh.dll</OriginalFileName>
+                    <CommandLine condition="contains any">$PROFILE;profile.ps1;Microsoft.PowerShellISE_profile.ps1;Microsoft.PowerShell_profile.ps1;Microsoft.VSCode_profile.ps1</CommandLine>
+                </Rule>
+
+            </ProcessCreate>
+
+            <FileCreate onmatch="include">
+                <!-- PowerShell Profile Files -->
+                <Rule name="[T1546.013] Powershell Profile" groupRelation="or">
+                    <TargetFilename condition="end with">\WindowsPowerShell\v1.0\profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\WindowsPowerShell\v1.0\Microsoft.PowerShell_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\WindowsPowerShell\profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\WindowsPowerShell\Microsoft.PowerShell_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\WindowsPowerShell\v1.0\Microsoft.PowerShellISE_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\PowerShell\7\profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\PowerShell\7\Microsoft.PowerShell_profile.ps1</TargetFilename>    
+                    <TargetFilename condition="end with">\PowerShell\profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">\PowerShell\Microsoft.PowerShell_profile.ps1</TargetFilename>
+                    <!-- Any Profile File -->
+                    <TargetFilename condition="contains">profile.ps1</TargetFilename>
+                    <TargetFilename condition="contains">Microsoft.PowerShell_profile.ps1</TargetFilename>
+                    <TargetFilename condition="contains">Microsoft.PowerShellISE_profile.ps1</TargetFilename>
+                    <TargetFilename condition="contains">Microsoft.VSCode_profile.ps1</TargetFilename> 
+                </Rule>
+
+                <!-- PowerShell Module Modification -->
+                <Rule name="[T1059.001] PowerShell Module" groupRelation="or">
+                    <TargetFilename condition="begin with">C:\Windows\system32\WindowsPowerShell</TargetFilename>
+                    <TargetFilename condition="begin with">C:\Windows\SysWOW64\WindowsPowerShell</TargetFilename>  
+                </Rule>
+
+
+
+            </FileCreate>
+
+            <!-- FileDelete: id_23 -->
+            <FileDelete onmatch="include">
+                <Rule name="[T1546.013] Powershell Profile" groupRelation="or">
+                    <TargetFilename condition="end with">profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">Microsoft.PowerShell_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">Microsoft.PowerShellISE_profile.ps1</TargetFilename>
+                    <TargetFilename condition="end with">Microsoft.VSCode_profile.ps1</TargetFilename>
+                </Rule>
+            </FileDelete>
+        
+            
+        </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>
+
+
+
+
+
+
+
+
