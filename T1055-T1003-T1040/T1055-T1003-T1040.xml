@@ -2,119 +2,84 @@
   <HashAlgorithms>*</HashAlgorithms>
   <CheckRevocation/>
     <EventFiltering>
-      <!--T1055-T1003-T1040-->
-      <RuleGroup name="" groupRelation="and">
-          <!-- Event ID 1 -->
-          <ProcessCreate onmatch="include">
-            <Rule name="[T1003.001]" groupRelation="or">
-              <Image condition="contains">procdump.exe</Image>
-              <Image condition="contains">mimikatz</Image>
-              <Image condition="contains">sekurlsa</Image>
-              <Image condition="contains">LaZagne</Image>
-              <Image condition="contains">QuarksPwDump</Image>
-              <CommandLine condition="contains">lsass</CommandLine>
-              <CommandLine condition="contains">minidump</CommandLine>
-              <CommandLine condition="contains">sekurlsa::logonpasswords</CommandLine>
-              <ParentImage condition="contains">powershell.exe</ParentImage>
-              <ParentImage condition="contains">cmd.exe</ParentImage>
-            </Rule>
-
-            <Rule name="[T1040]" groupRelation="or">
-              <Image condition="contains">tcpdump</Image>
-              <Image condition="contains">windump</Image>
-              <Image condition="contains">wireshark</Image>
-              <Image condition="contains">npcap</Image>
-            </Rule>
-          </ProcessCreate>
-
-          <!-- EVENT ID 3 -->
+        <!-- Event ID 1 -->
+        <RuleGroup name="[T1003]" groupRelation="and">
+            <ProcessCreate onmatch="include">
+                <Image condition="contains">procdump.exe</Image>
+                <Image condition="contains">mimikatz</Image>
+                <Image condition="contains">sekurlsa</Image>
+                <Image condition="contains">LaZagne</Image>
+                <Image condition="contains">QuarksPwDump</Image>
+                <CommandLine condition="contains">lsass</CommandLine>
+                <CommandLine condition="contains">minidump</CommandLine>
+                <CommandLine condition="contains">sekurlsa::logonpasswords</CommandLine>
+                <ParentImage condition="contains">powershell.exe</ParentImage>
+                <ParentImage condition="contains">cmd.exe</ParentImage>
+                <Image name="[T1040]" condition="contains">tcpdump</Image>
+                <Image name="[T1040]" condition="contains">windump</Image>
+                <Image name="[T1040]" condition="contains">wireshark</Image>
+                <Image name="[T1040]" condition="contains">npcap</Image>
+            </ProcessCreate>            
+        </RuleGroup>
+        <!-- EVENT ID 3 -->
+        <RuleGroup name="[T1040]" groupRelation="and">
           <NetworkConnect onmatch="include">
-            <Rule name="[T1040]" groupRelation="or">
               <Image condition="contains">tcpdump</Image>
               <Image condition="contains">windump</Image>
               <Image condition="contains">wireshark</Image>
               <Image condition="contains">npcap</Image>
-            </Rule>
-          </NetworkConnect>
-
-          <!-- Event ID 6 -->
+          </NetworkConnect>            
+        </RuleGroup>
+        <!-- Event ID 6 -->
+        <RuleGroup name="[T1040]" groupRelation="and">
           <DriverLoad onmatch="include">
-            <Rule name="[T1040]" groupRelation="or">
-              <ImageLoaded condition="contains">npcap</ImageLoaded>
-              <ImageLoaded condition="contains">npf.sys</ImageLoaded>
-            </Rule>
-          </DriverLoad>
-
-          <!-- EVENT ID 8 -->
-          <!-- Detect T1055.x Process Injection -->
+            <ImageLoaded condition="contains">npcap</ImageLoaded>
+            <ImageLoaded condition="contains">npf.sys</ImageLoaded>
+          </DriverLoad>    
+        </RuleGroup>
+        <!-- EVENT ID 8 -->
+        <RuleGroup name="[T1055]" groupRelation="or">
           <CreateRemoteThread onmatch="include">    
-            <Rule name="[T1055.001]" groupRelation="or">
-              <TargetImage condition="contains">lsass.exe</TargetImage>
-            </Rule>
-
-            <Rule name="[T1055]" groupRelation="or">
-              <TargetImage condition="end with">winlogon.exe</TargetImage>
-              <TargetImage condition="end with">services.exe</TargetImage>
-              <TargetImage condition="end with">svchost.exe</TargetImage>
-              <TargetImage condition="end with">explorer.exe</TargetImage>
-              <TargetImage condition="end with">notepad.exe</TargetImage>
-            </Rule>
-
-            <Rule name="[T1055.001]" groupRelation="or">
-              <TargetImage condition="contains any">chrome.exe;firefox.exe;msedge.exe;brave.exe</TargetImage>  
-            </Rule>
-
-              <!-- Known suspicious injecting processes -->
-            <Rule name="[T1055]" groupRelation="or">
-              <SourceImage condition="contains">powershell.exe</SourceImage>
-              <SourceImage condition="contains">pwsh.exe</SourceImage>
-              <SourceImage condition="contains">wscript.exe</SourceImage>
-              <SourceImage condition="contains">cscript.exe</SourceImage>
-              <SourceImage condition="contains">cmd.exe</SourceImage>
-              <SourceImage condition="contains">mshta.exe</SourceImage>
-            </Rule>
-
-            <!--all -->
+            <TargetImage condition="contains">lsass.exe</TargetImage>
+            <TargetImage condition="end with">winlogon.exe</TargetImage>
+            <TargetImage condition="end with">services.exe</TargetImage>
+            <TargetImage condition="end with">svchost.exe</TargetImage>
+            <TargetImage condition="end with">Explorer.exe</TargetImage>
+            <TargetImage condition="end with">notepad.exe</TargetImage>
+            <TargetImage condition="contains any">chrome.exe;firefox.exe;msedge.exe;brave.exe</TargetImage>  
+            <SourceImage condition="contains">powershell.exe</SourceImage>
+            <SourceImage condition="contains">pwsh.exe</SourceImage>
+            <SourceImage condition="contains">wscript.exe</SourceImage>
+            <SourceImage condition="contains">cscript.exe</SourceImage>
+            <SourceImage condition="contains">cmd.exe</SourceImage>
+            <SourceImage condition="contains">mshta.exe</SourceImage>
             <SourceImage condition="end with">.exe</SourceImage>
             <SourceImage condition="end with">.dll</SourceImage>
           </CreateRemoteThread>
-
-
-          <!-- Event ID 10 -->
+        </RuleGroup>
+        <!-- Event ID 10 -->
+        <RuleGroup name="[T1003][T1055]" groupRelation="and">
           <ProcessAccess onmatch="include">
-            <Rule name="[T1003.001]" groupRelation="and">
-              <TargetImage condition="end with">lsass.exe</TargetImage>
-              <GrantedAccess condition="contains">0x1410</GrantedAccess> <!-- PROCESS_VM_READ -->
-              <GrantedAccess condition="contains">0x1010</GrantedAccess> <!-- PROCESS_QUERY_INFORMATION|PROCESS_VM_READ -->
-              <GrantedAccess condition="contains">0x143A</GrantedAccess> <!-- PROCESS_VM_READ|PROCESS_VM_WRITE|PROCESS_VM_OPERATION -->
-            </Rule>
-
-            <Rule name="[T1055]" groupRelation="or">
-              <SourceImage condition="contains">powershell.exe</SourceImage>
-              <SourceImage condition="contains">pwsh.exe</SourceImage>
-              <SourceImage condition="contains">cmd.exe</SourceImage>
-              <SourceImage condition="contains">wscript.exe</SourceImage>
-              <SourceImage condition="contains">cscript.exe</SourceImage>
-              <SourceImage condition="contains">rundll32.exe</SourceImage>
-              <SourceImage condition="contains">regsvr32.exe</SourceImage>
-            </Rule>
-
-            <Rule name="[T1055]" groupRelation="or">
-              <CallTrace condition="contains">unknown</CallTrace>
-            </Rule>
+            <TargetImage name="[T1003.001]" condition="end with">lsass.exe</TargetImage>
+            <SourceImage condition="contains">powershell.exe</SourceImage>
+            <SourceImage condition="contains">pwsh.exe</SourceImage>
+            <SourceImage condition="contains">cmd.exe</SourceImage>
+            <SourceImage condition="contains">wscript.exe</SourceImage>
+            <SourceImage condition="contains">cscript.exe</SourceImage>
+            <SourceImage condition="contains">rundll32.exe</SourceImage>
+            <SourceImage condition="contains">regsvr32.exe</SourceImage>
+            <CallTrace condition="contains">unknown</CallTrace>
           </ProcessAccess>
-
-          <!-- Event ID 11 -->
+        </RuleGroup>
+        <!-- Event ID 11 -->
+        <RuleGroup name="[T1003]" groupRelation="and">
           <FileCreate onmatch="include">
-            <Rule name="[T1003]" groupRelation="or">
               <TargetFilename condition="contains">.dmp</TargetFilename>
               <TargetFilename condition="contains">passwd</TargetFilename>
               <TargetFilename condition="contains">shadow</TargetFilename>
               <TargetFilename condition="contains">lsass.dmp</TargetFilename>
               <TargetFilename condition="contains">sekurlsa</TargetFilename>
-            </Rule>
-          </FileCreate>
-      </RuleGroup>
+          </FileCreate>  
+        </RuleGroup>
     </EventFiltering>
 </Sysmon>
-
