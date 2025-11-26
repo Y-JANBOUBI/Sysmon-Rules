@@ -1,0 +1,52 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+  <EventFiltering>
+    <RuleGroup name="[T1136]" groupRelation="and">
+      <ProcessCreate onmatch="include">
+        
+        <!--[T1087] Account Discovery-->
+        <Rule name="[T1087] Account Discovery" groupRelation="or">
+          <OriginalFileName condition="is">klist.exe</OriginalFileName> 
+          <OriginalFileName condition="is">cmdkey.exe</OriginalFileName> 
+          <OriginalFileName condition="is">djoin.exe</OriginalFileName>
+          <CommandLine condition="contains any">dir C:\users;ls C:\users</CommandLine> 
+        </Rule>
+
+        <Rule name="[T1087] Account Discovery net.exe" groupRelation="and">
+          <Image condition="is">C:\Windows\System32\net.exe</Image>
+          <OriginalFileName condition="is">net.exe</OriginalFileName>
+          <CommandLine condition="contains any">localgroup;user;group;accounts</CommandLine>
+        </Rule>
+
+        <Rule name="[T1087] Account Discovery net1.exe" groupRelation="and">
+          <Image condition="is">C:\Windows\System32\net1.exe</Image>
+          <OriginalFileName condition="is">net1.exe</OriginalFileName>
+          <CommandLine condition="contains any">localgroup;user;group;accounts</CommandLine>
+        </Rule>
+
+        <Rule name="[T1087] Account Discovery PowerShell" groupRelation="and">
+          <Image condition="end with">\powershell.exe</Image>
+          <OriginalFileName condition="is">powershell.exe</OriginalFileName>
+          <CommandLine condition="contains any">New-ADUser;Get-LocalUser;Get-ADUser;Get-WmiObject Win32_UserAccount;Get-CimInstance Win32_UserAccount</CommandLine>
+        </Rule>
+
+        <Rule name="[T1087] Account Discovery Pwsh" groupRelation="and">
+          <Image condition="end with">\pwsh.exe</Image>
+          <OriginalFileName condition="is">pwsh.exe</OriginalFileName>
+          <CommandLine condition="contains any">New-ADUser;Get-LocalUser;Get-ADUser;Get-WmiObject Win32_UserAccount;Get-CimInstance Win32_UserAccount</CommandLine>
+        </Rule>
+
+        <Image condition="is">C:\Windows\System32\dsadd.exe</Image>
+        <Image condition="end with">net.exe</Image>
+        <Image condition="end with">net1.exe</Image>
+        <CommandLine condition="contains">wmic useraccount</CommandLine>
+        
+      </ProcessCreate> 
+      
+      <RegistryEvent onmatch="include">
+        <TargetObject condition="contains">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList</TargetObject>      
+      </RegistryEvent>
+    </RuleGroup>
+  </EventFiltering>
+</Sysmon>
