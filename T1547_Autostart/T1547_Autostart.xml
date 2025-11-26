@@ -1,0 +1,59 @@
+
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  <CheckRevocation/>
+    <EventFiltering>
+       
+       <RuleGroup name="" groupRelation="or">
+            <!--Driver Load"-->
+            <DriverLoad onmatch="include">
+                <Rule name="[T1547] Driver Load">
+                    <ImageLoaded condition="end with">.sys</ImageLoaded>
+                </Rule>
+            </DriverLoad>
+
+            <!-- Event ID 11: File Creation - Catch files being placed in startup locations -->
+            <FileCreate onmatch="include">
+                <!-- Startup folder and shortcut modification -->
+                <Rule name="[T1547]" groupRelation="and"> 
+                    <TargetFilename condition="contains">\Start Menu\Programs\Startup\</TargetFilename>
+                    <TargetFilename condition="end with">.lnk</TargetFilename>
+                </Rule>
+                
+                <Rule name="[T1547]" groupRelation="or">
+                    <TargetFilename condition="contains">\Start Menu</TargetFilename>
+                    <TargetFilename condition="contains">\Startup\</TargetFilename>   
+                    <TargetFilename condition="contains">\Start Menu\Programs\Startup\</TargetFilename>
+                    <TargetFilename condition="end with">.lnk</TargetFilename>
+                </Rule>
+
+            </FileCreate>
+
+            <!-- Event ID 12: Registry Event (Object create and delete) - Catch modifications to autostart keys -->
+            <RegistryEvent onmatch="include">
+            
+                <!-- T1547.001 - Common Run Keys -->  
+                <Rule name="[T1547] reg" groupRelation="or">
+                    <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\Run</TargetObject>
+                    <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\RunOnce</TargetObject>
+                    <TargetObject condition="contains">\Wow6432Node\Microsoft\Windows\CurrentVersion\Run</TargetObject>
+                    <TargetObject condition="contains">\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce </TargetObject>
+                    <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\RunServices</TargetObject>
+                    <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\RunServicesOnce</TargetObject>
+                    <TargetObject condition="contains">\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run</TargetObject>
+                    <TargetObject condition="contains">\Microsoft\Windows NT\CurrentVersion\Winlogon</TargetObject>
+
+                    <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+                    <TargetObject condition="contains">\CurrentVersion\RunOnce</TargetObject>
+                    <TargetObject condition="contains">\CurrentVersion\RunServices</TargetObject>
+                    <TargetObject condition="contains">\CurrentVersion\RunServicesOnce</TargetObject> 
+                    <TargetObject condition="contains">\CurrentVersion\Winlogon</TargetObject>
+
+                    <TargetObject condition="begin with">HKLM\SOFTWARE\Microsoft\Active Setup\Installed Components</TargetObject>
+
+                </Rule>    
+            </RegistryEvent>         
+       </RuleGroup>
+
+    </EventFiltering>
+</Sysmon>
