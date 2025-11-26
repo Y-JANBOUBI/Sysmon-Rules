@@ -1,0 +1,98 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+  
+  <CheckRevocation/>
+    <EventFiltering>
+        <RuleGroup name="Windows service TTPs" groupRelation="and">
+            
+            <ProcessCreate onmatch="include">
+                <!--services.msc-->
+                <Rule name="services.msc detected" groupRelation="and">
+                    <Image condition="is">C:\Windows\System32\mmc.exe</Image>
+                    <OriginalFileName condition="is">mmc.exe</OriginalFileName>
+                    <CommandLine condition="contains">mmc.exe</CommandLine>
+                    <CommandLine condition="contains">services.msc</CommandLine>
+                </Rule>
+
+                <!-- [T1569.002] PowerShell service management -->
+                <Rule name="[T1569.002] System Services via PowerShell" groupRelation="and">
+                    <Image condition="end with">powershell.exe</Image>
+                    <OriginalFileName condition="is">powershell.exe</OriginalFileName>
+                    <CommandLine condition="contains any">New-Service;Set-Service;Remove-Service;Start-Service;Stop-Service;Restart-Service</CommandLine>
+                </Rule>
+                <Rule name="[T1569.002] System Services via Pwsh" groupRelation="and">
+                    <Image condition="end with">pwsh.exe</Image>
+                    <OriginalFileName condition="is">pwsh.exe</OriginalFileName>
+                    <CommandLine condition="contains any">New-Service;Set-Service;Remove-Service;Start-Service;Stop-Service;Restart-Service</CommandLine>
+                </Rule>
+
+                <!-- [T1007] System Service Discovery -->
+                <Rule name="[T1007] System Service Discovery" groupRelation="and">
+                    <OriginalFileName condition="is">sc.exe</OriginalFileName>
+                    <CommandLine condition="contains any">query;qc;description</CommandLine>
+                </Rule>
+
+                <!-- T1543.003: Create or Modify System Process: can you filter with (create;binPath;start= )-->
+                <!-- T1031: Modify Existing Service: can you filter with  (config;start=;binPath) -->
+                <!-- T1564.009: Service Stop (Defense Evasion): can you filter with stop;pause -->
+                <!-- [T1569.002] System Services (service creation, deletion, start/stop) -->
+                <Rule name="[T1569.002] Services action detected" groupRelation="and">
+                    <Image condition="is">C:\Windows\System32\sc.exe</Image>
+                    <OriginalFileName condition="is">sc.exe</OriginalFileName>
+                    <CommandLine condition="contains any">service;start=;binPath;config;delete;create;stop;pause;failure</CommandLine>
+                </Rule>
+                <Rule name="[T1569.002] Services action detected" groupRelation="and">
+                    <Image condition="is">C:\Windows\System32\sc.exe</Image>
+                    <OriginalFileName condition="is">sc.exe</OriginalFileName>
+                </Rule>
+
+                <!-- [T1543.003] Create or Modify System Service - Net.exe-->
+                <Rule name="[T1543.003] Create or Modify System Service - Net.exe" groupRelation="and">
+                    <OriginalFileName condition="is">net.exe</OriginalFileName>
+                    <CommandLine condition="contains any">start;stop;pause;continue</CommandLine>
+                </Rule>
+                
+                <!-- T1547.009 - Shortcut Modification -->
+                <Rule name="[T1547.009] Service Spawned Suspicious Process" groupRelation="and">
+                    <ParentImage condition="contains">services.exe;svchost.exe</ParentImage>
+                    <Image condition="contains">cmd.exe;powershell.exe;pwsh.exe;wscript.exe;cscript.exe;mshta.exe;rundll32.exe</Image>
+                </Rule>
+            </ProcessCreate>
+                        
+            <RegistryEvent onmatch="include">
+                <!-- [T1543.003]-[T1546.008] Registry Modifications for Services -->
+                <!-- T1543.003 - Service Registry Modifications -->
+                <Rule name="[T1543.003] Service Registry Creation" groupRelation="and">
+                    <TargetObject condition="contains">HKLM\SYSTEM\CurrentControlSet\Services\</TargetObject>
+                    <EventType condition="is">CreateKey</EventType>
+                </Rule>
+                <Rule name="[T1543.003] Service ImagePath Modification" groupRelation="and">
+                    <TargetObject condition="contains">HKLM\SYSTEM\CurrentControlSet\Services\</TargetObject>
+                    <TargetObject condition="end with">ImagePath</TargetObject>
+                    <EventType condition="is">SetValue</EventType>
+                </Rule>
+            </RegistryEvent>
+                        
+            <CreateRemoteThread onmatch="include">
+                <Rule name="Remote Thread Creation" groupRelation="and">
+                    <TargetImage condition="contains any">svchost.exe;services.exe</TargetImage>
+                    <TargetImage condition="end with">\\services.exe</TargetImage>
+                    <TargetImage condition="end with">\\svchost.exe</TargetImage>   
+                </Rule>
+            </CreateRemoteThread>
+
+        </RuleGroup>
+        
+    </EventFiltering>
+</Sysmon>
+               
+               
+
+
+
+
+
+
+
+
+
