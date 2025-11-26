@@ -1,0 +1,61 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>*</HashAlgorithms>
+ 
+  <CheckRevocation/>
+  <EventFiltering>
+
+    <RuleGroup name="[T1112]" groupRelation="and">
+    
+         <ProcessCreate onmatch="include">
+            <!-- [T1112] Registry Modify -->
+            <Rule name="[T1112] Registry Modify" groupRelation="and">
+                <OriginalFileName condition="is any">reg.exe;regedit.exe</OriginalFileName>
+                <CommandLine condition="contains any">/i;.reg</CommandLine>
+            </Rule>
+            <Rule name="[T1112] Modify Registry" groupRelation="and"> 
+                <OriginalFileName condition="is any">reg.exe;regedit.exe</OriginalFileName>
+                <CommandLine condition="contains any">hklm;HKLM;hkey_local_machine</CommandLine>
+                <CommandLine condition="contains any">\system;\sam;\security</CommandLine>
+            </Rule>
+            <Rule name="[T1112] Registry Modify" groupRelation="or">
+                <Image condition="is">C:\Windows\System32\reg.exe</Image>
+                <OriginalFileName condition="is any">reg.exe;regedit.exe</OriginalFileName>
+            </Rule>
+        </ProcessCreate>
+
+        <NetworkConnect onmatch="include">
+            <Image condition="image">reg.exe</Image>
+            <Image condition="image">regsvcs.exe</Image>
+            <Image condition="image">regsvr32.exe</Image>
+        </NetworkConnect>
+
+        <FileCreate onmatch="include">
+            <Rule name="[T1112]" groupRelation="and">
+                <TargetFilename condition="end with">.reg</TargetFilename>
+                <TargetFilename condition="end with">.jse</TargetFilename>   
+            </Rule>
+        </FileCreate>
+
+        <RegistryEvent onmatch="include">
+            <Rule name="[T1112] reg" groupRelation="or">
+                <EventType condition="is">KeyCreate</EventType>
+                <EventType condition="is">KeyWrite</EventType>
+                <EventType condition="is">KeyDelete</EventType>
+                <EventType condition="is">RenameKey</EventType>
+                <EventType condition="is">RenameValue</EventType>
+            </Rule>
+        </RegistryEvent>
+       
+        <FileDelete onmatch="include">
+            <TargetFilename condition="end with">.reg</TargetFilename>
+            <TargetFilename condition="end with">.jse</TargetFilename>  
+        </FileDelete>
+
+    </RuleGroup>
+
+  </EventFiltering>
+</Sysmon>
+
+
+
+
