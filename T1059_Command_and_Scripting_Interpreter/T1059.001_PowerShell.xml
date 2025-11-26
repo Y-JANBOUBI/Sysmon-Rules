@@ -55,8 +55,15 @@
                     <TargetFilename condition="end with">.ps2</TargetFilename>	
                     <TargetFilename condition="end with">.psm1</TargetFilename>	
                 </Rule>
+              
+                <!-- PowerShell Module Modification -->
+                <Rule name="[T1059.001] PowerShell Module" groupRelation="or">
+                    <TargetFilename condition="begin with">C:\Windows\system32\WindowsPowerShell</TargetFilename>
+                    <TargetFilename condition="begin with">C:\Windows\SysWOW64\WindowsPowerShell</TargetFilename>  
+                </Rule>
             </FileCreate>
         </RuleGroup>
 
     </EventFiltering>
+
 </Sysmon>
