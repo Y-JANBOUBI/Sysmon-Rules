@@ -3,7 +3,7 @@
   <CheckRevocation/>
     <EventFiltering>
         <!-- Event ID 1 -->
-        <RuleGroup name="[T1003]" groupRelation="and">
+        <RuleGroup name="[T1003]" groupRelation="or">
             <ProcessCreate onmatch="include">
                 <Image condition="contains">procdump.exe</Image>
                 <Image condition="contains">mimikatz</Image>
@@ -22,7 +22,7 @@
             </ProcessCreate>            
         </RuleGroup>
         <!-- EVENT ID 3 -->
-        <RuleGroup name="[T1040]" groupRelation="and">
+        <RuleGroup name="[T1040]" groupRelation="or">
           <NetworkConnect onmatch="include">
               <Image condition="contains">tcpdump</Image>
               <Image condition="contains">windump</Image>
@@ -31,7 +31,7 @@
           </NetworkConnect>            
         </RuleGroup>
         <!-- Event ID 6 -->
-        <RuleGroup name="[T1040]" groupRelation="and">
+        <RuleGroup name="[T1040]" groupRelation="or">
           <DriverLoad onmatch="include">
             <ImageLoaded condition="contains">npcap</ImageLoaded>
             <ImageLoaded condition="contains">npf.sys</ImageLoaded>
@@ -58,7 +58,7 @@
           </CreateRemoteThread>
         </RuleGroup>
         <!-- Event ID 10 -->
-        <RuleGroup name="[T1003][T1055]" groupRelation="and">
+        <RuleGroup name="[T1003][T1055]" groupRelation="or">
           <ProcessAccess onmatch="include">
             <TargetImage name="[T1003.001]" condition="end with">lsass.exe</TargetImage>
             <SourceImage condition="contains">powershell.exe</SourceImage>
@@ -72,7 +72,7 @@
           </ProcessAccess>
         </RuleGroup>
         <!-- Event ID 11 -->
-        <RuleGroup name="[T1003]" groupRelation="and">
+        <RuleGroup name="[T1003]" groupRelation="or">
           <FileCreate onmatch="include">
               <TargetFilename condition="contains">.dmp</TargetFilename>
               <TargetFilename condition="contains">passwd</TargetFilename>
@@ -83,3 +83,4 @@
         </RuleGroup>
     </EventFiltering>
 </Sysmon>
+
