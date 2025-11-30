@@ -48,9 +48,7 @@
                     <TargetFilename condition="begin with">C:\Windows\system32\WindowsPowerShell</TargetFilename>
                     <TargetFilename condition="begin with">C:\Windows\SysWOW64\WindowsPowerShell</TargetFilename>  
                 </Rule>
-
-
-
+              
             </FileCreate>
 
             <!-- FileDelete: id_23 -->
@@ -68,6 +66,7 @@
 
     </EventFiltering>
 </Sysmon>
+
 
 
 
